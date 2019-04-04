@@ -10,9 +10,9 @@
 # Import
 # ===============================================================
 import pandas as pd
-from sklearn import preprocessing
-import numpy as np
-
+from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
 
 # ===============================================================
 # Useful variables used by the module: Taken from Explore features
@@ -85,7 +85,7 @@ def get_raw_data():
     """
     Loads the provided dataframe, removes the single valued columns and replaces a value in var3 according to the
     results in ../Explore_data
-    :return: dataframe - (pandas dataframe)
+    :return: dataframe - (pd.dataFrame)
     """
     # Load provided dataframe
     # Path is relative to the script it is run from
@@ -108,11 +108,10 @@ def get_raw_data():
 def filter_datframe(dataframe, filter_case="None"):
     """
     Returns filtered dataframe
-    :param dataframe: pandas dataframe to be filtered
-    :param filter_case: string specifying the case to be filtered
-    :return: filtered dataframe according to filter_case
+    :param dataframe: (pd.dataFrame) pandas dataframe to be filtered
+    :param filter_case: (string) specifies the case to be filtered
+    :return: (pd.dataFrame) filtered dataframe according to filter_case
     """
-
     if filter_case == "None":
         return dataframe
 
@@ -136,14 +135,10 @@ def filter_datframe(dataframe, filter_case="None"):
         return dataframe[std_cols + COL_1k_VALUED + COL_5k_VALUED + COL_10k_VALUED]
 
     elif filter_case == "high-valued":
-        # Return columns with more than 5000
-        return dataframe[std_cols + COL_10k_VALUED + COL_upper10k_VALUED]
-
-    elif filter_case == "high-valued-plus":
         # Return columns with more than 1000 values
         return dataframe[std_cols + COL_5k_VALUED + COL_10k_VALUED + COL_upper10k_VALUED]
-
-    print("DataFrame normalized")
+    else:
+        raise ValueError('Provided filter_case not supported')
 
 
 def norm_transform_dataframe(dataframe, norm_case, scale_factor=1):
@@ -152,7 +147,7 @@ def norm_transform_dataframe(dataframe, norm_case, scale_factor=1):
     :param dataframe: (pd.dataFrame) dataframe to be normalized
     :param norm_case: (string) "mean" or "minmax"
     :param scale_factor: (int) optional factor when using min max normalization
-    :return:
+    :return: (pd.dataFrame) normalized data frame
     """
     feat_cols = [x for x in dataframe.columns if not x in std_cols]
 
@@ -170,8 +165,66 @@ def norm_transform_dataframe(dataframe, norm_case, scale_factor=1):
         for elem in std_cols:
             normalized_df[elem] = dataframe[elem]
         return normalized_df
+    else:
+        raise ValueError('Provided norm_case not supported')
 
-    print("DataFrame normalized")
+def apply_pca(dataframe, dimensions):
+    """
+    Perform PCA on a dataFrame
+    :param dataframe: (pd.dataFrame) dataFrame to be reduced
+    :param dimensions: (int) number of principal components
+    :return: (pd.dataFrame)
+    """
+    feat_cols = [x for x in dataframe.columns if not x in std_cols]
+
+    x = dataframe.loc[:, feat_cols].values
+
+    pca = PCA(n_components=dimensions)
+
+    new_cols = ['pc_%i' % (i+1) for i in range(dimensions)]
+
+    pca_result = pca.fit_transform(x)
+
+    pd_pca = pd.DataFrame(data=pca_result, columns=new_cols)
+
+    return pd.concat([pd_pca, dataframe[["TARGET"]]], axis=1)
 
 
+def split_datagram_test_train(dataframe, test_size=0.1):
+    """
+    Creates an stratified data split of train and test data from the datagFrame
+    :param dataframe: (datagFrame) data to be splitted also containing the target column
+    :param test_size: (double) - percentage of test-set
+    :return:
+    """
+    feat_cols = [x for x in dataframe.columns if not x in std_cols]
+    X = dataframe[feat_cols].values
+    Y = dataframe["TARGET"].values
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_size, stratify=Y)
+    return X_train, X_test, y_train, y_test
+
+
+def simple_x_y_split(X, Y, split_size):
+    """
+    Split the X and Y elements
+    :param X: (array)
+    :param Y: (array)
+    :param split_size: (double) - split size percentage for X_2 and Y_2
+    :return: X_1, y_1, X_2, y_2
+    """
+    return train_test_split(X, y, test_size=split_size, stratify=Y)
+
+
+def perform_smote(X, y):
+    """
+    Oversample minority class using a 5 nearest neighbors approach
+    :param X: (array) (m,n) feature array
+    :param y: (array) (m,1) targets
+    :return: X_res and y_res with oversampled minority class
+    """
+    sm = SMOTE()
+    # Resample all clases but the majority class
+    # see (https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTE.html)
+    X_res, y_res = sm.fit_resample(X, y)
+    return X_res, y_res
 

@@ -41,7 +41,17 @@ def get_xcross_plot(datagram, cols=None, figsize=(20, 16), cmap='coolwarm'):
 
     sns.heatmap(subdata_corr, linewidths=0.5, cmap=cmap, annot=True, ax=ax)
 
-
+def plot_rco_auc(fpr, tpr, roc_auc):
+    # Plot ROC
+    plt.title('Receiver Operating Characteristic')
+    plt.plot(fpr, tpr, 'b', label='AUC = %0.3f' % roc_auc)
+    plt.legend(loc='lower right')
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.xlim([-0.1, 1.0])
+    plt.ylim([-0.1, 1.01])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.show()
 
 
 # ===============================================================
