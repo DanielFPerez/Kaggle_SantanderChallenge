@@ -131,7 +131,7 @@ def filter_dataframe(dataframe, filter_case="None"):
         return dataframe[std_cols + COL_1k_VALUED + COL_5k_VALUED]
 
     elif filter_case == "middle-valued-plus":
-        # Return columns with 100 to 10000Ñ 58 features
+        # Return columns with 100 to 10000: 58 features
         return dataframe[std_cols + COL_1k_VALUED + COL_5k_VALUED + COL_10k_VALUED]
 
     elif filter_case == "high-valued":

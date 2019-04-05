@@ -21,35 +21,48 @@ import matplotlib.pyplot as plt
 import pickle
 plt.interactive(False)
 # ===============================================================
+# Calculate total number of cases to be evaluated
+# ===============================================================
+n_pca_dimension_cases = 1   # Try out 3 different dimension number while doing PCA + dim=10 from empirical test case if
+                            # not already present
+n_n_estimators = 1          # Try out 3 different "number of trees" possible values for the random forest + n_estimators=10
+                            # from empirical test case
+n_max_depth = 1             # Try out 3 different "number of trees" possible values for the random forest + depth=30
+                            # from empirical test case
+
+# ===============================================================
 # Fix/Random Variables for Hyper-parameter search
 # ===============================================================
-
-# Set cases extracting different features from the aavailable data
-# See include/preprocess.py
-df_filter_cases = ['low-valued-plus', 'middle-valued', 'middle-valued-plus', 'high-valued']
+# Set cases extracting different features from the available data
+# See include/preprocess.py for more df_filter_cases options
+df_filter_cases = ['low-valued-plus',
+                   'middle-valued-plus',
+                   'high-valued']
 
 # Set normalization case implemented
 norm_case_cases = ['mean', 'minmax']
 
 # Set number of PCA components to try out
 # Choose 3 random values between 3 dimensions and 20 dimensions
-pca_dimension_cases = np.random.randint(low=3, high=18, size=4)
+pca_dimension_cases = np.random.randint(low=3, high=18, size=n_pca_dimension_cases)
 # Append value 15 as was the highest performing PCA dimension during manual exploration
 if 15 not in pca_dimension_cases:
     pca_dimension_cases = np.append(pca_dimension_cases, 15)
 
 # Parameters for the random forest
 # Number of trees in the RF
-n_estimators = np.random.randint(2, 15, size=4)
+n_estimators = np.random.randint(2, 15, size=n_n_estimators)
 if 10 not in n_estimators:
     n_estimators = np.append(n_estimators, 10)
 # Max depth of tree
-max_depth = np.random.randint(5, 40, size=5)
+max_depth = np.random.randint(5, 40, size=n_max_depth)
 if 30 not in n_estimators:
     max_depth = np.append(max_depth, 30)
 
 rf_grid = [(i, j) for i in n_estimators.tolist() for j in max_depth.tolist()]
 
+n_tot_cases = len(norm_case_cases) * len(df_filter_cases) * pca_dimension_cases.shape[0] * n_estimators.shape[0] * max_depth.shape[0]
+print("A total of ", n_tot_cases, " cases will be evaluated.\n")
 # ===============================================================
 # Log Variables
 # ===============================================================
@@ -61,9 +74,9 @@ rf_winner = {"logger_index": None,
              "n_trees": 0,
              "tree_depth": 0,
              "auc_val": 0.0,
-             "auc_test":0.0,
+             "auc_test": 0.0,
              "rf_object": None}
-roc_auc_tracker = 0.0
+roc_auc_test_tracker = 0.0
 roc_auc_val_tracker = 0.0
 
 # Pandas dataFrame for logging
@@ -76,7 +89,6 @@ out_path_winner = "./data/output/"
 
 # Directory for saving logger and plots
 out_path_log = "./data/output/log/"
-
 
 # ===============================================================
 # Build-Train-Test
@@ -130,11 +142,6 @@ for feature_filter in df_filter_cases:
 
                 mean_tpr = np.mean(tprs, axis=0)
                 mean_auc = auc(mean_fpr, mean_tpr)
-
-                # Report maximum achieve average on cross validation
-                if mean_auc > roc_auc_val_tracker:
-                    print("Maximum cv mean auc found: ", mean_auc, " at logger index ", logger_index)
-
                 std_auc = np.std(aucs)
                 std_tpr = np.std(tprs, axis=0)
 
@@ -143,22 +150,30 @@ for feature_filter in df_filter_cases:
                 fpr_test, tpr_test, thresholds_test = roc_curve(y_test, probs_test[:, 1])
                 roc_auc_test = auc(fpr_test, tpr_test)
 
-                # Log result
-                printAssistant.plot_total_rocauc(mean_tpr, mean_auc, std_auc, std_tpr, mean_fpr)
-                img_path = out_path_log + "cv_roc_plot_" + str(logger_index) + ".png"
-                printAssistant.save_auc_roc_plot(img_path)
-                pd_logger.loc[logger_index] = {"filter_case": feature_filter,
-                                               "norm_case": norm_case,
-                                               "pca_dim": pca_dim,
-                                               "n_trees": estim,
-                                               "tree_depth": depth,
-                                               "cv_mean_auc": mean_auc,
-                                               "test_auc": None,
-                                               "image_path": img_path}
+                avoid_cv_test_overlap = True
+
+                # Log result if new best AUC over x-validation found
+                if mean_auc > roc_auc_val_tracker:
+                    roc_auc_val_tracker = mean_auc
+                    print("Maximum cv mean auc found: ", mean_auc, " at logger index: ", logger_index)
+                    printAssistant.plot_total_rocauc(mean_tpr, mean_auc, std_auc, std_tpr, mean_fpr)
+                    img_path = out_path_log + "cv_roc_plot_" + str(logger_index) + ".png"
+                    printAssistant.save_auc_roc_plot(img_path)
+                    avoid_cv_test_overlap = False
+                    pd_logger.loc[logger_index] = {"filter_case": feature_filter,
+                                                   "norm_case": norm_case,
+                                                   "pca_dim": pca_dim,
+                                                   "n_trees": estim,
+                                                   "tree_depth": depth,
+                                                   "cv_mean_auc": mean_auc,
+                                                   "test_auc": roc_auc_test,
+                                                   "image_path": img_path}
+                    # Close plot to be able to plot after each iteration
+                    printAssistant.close_plot()
 
                 # Log winner rf if test performance achieved
-                if roc_auc_test > roc_auc_tracker:
-                    roc_auc_tracker = roc_auc_test
+                if roc_auc_test > roc_auc_test_tracker:
+                    roc_auc_test_tracker = roc_auc_test
                     rf_winner["logger_index"] = logger_index
                     rf_winner["filter_case"] = feature_filter
                     rf_winner["pca_dim"] = pca_dim
@@ -167,11 +182,28 @@ for feature_filter in df_filter_cases:
                     rf_winner["auc_val"] = mean_auc
                     rf_winner["auc_test"] = roc_auc_test
                     rf_winner["rf_object"] = classifier
-                    print("New best AUC over test set found: ", roc_auc_test)
+                    print("New best AUC over test set found: ", roc_auc_test, "at logger index: ", logger_index)
+                    # Add case to log file
+                    if avoid_cv_test_overlap:
+                        printAssistant.plot_total_rocauc(mean_tpr, mean_auc, std_auc, std_tpr, mean_fpr)
+                        img_path = out_path_log + "cv_roc_plot_" + str(logger_index) + ".png"
+                        printAssistant.save_auc_roc_plot(img_path)
+                    pd_logger.loc[logger_index] = {"filter_case": feature_filter,
+                                                   "norm_case": norm_case,
+                                                   "pca_dim": pca_dim,
+                                                   "n_trees": estim,
+                                                   "tree_depth": depth,
+                                                   "cv_mean_auc": mean_auc,
+                                                   "test_auc": roc_auc_test,
+                                                   "image_path": img_path}
+                    # Save/overwrite image of rf_winner
                     printAssistant.save_auc_roc_plot(out_path_winner+"rf_winner.png")
+                    # Close plot to be able to plot after each iteration
+                    printAssistant.close_plot()
 
-                # Close plot to be able to plot after each iteration
-                printAssistant.close_plot()
+                # Increment the logger index
+                print("######## Model iteration ", logger_index, " finished ################################ ")
+                logger_index += 1
 
 # Save log table
 pd_logger.to_csv(out_path_log+"log.csv")

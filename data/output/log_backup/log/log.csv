@@ -1,0 +1,17 @@
+,filter_case,norm_case,pca_dim,n_trees,tree_depth,cv_mean_auc,test_auc,image_path
+0,filter_case,norm_case,pca_dim,n_trees,tree_depth,cv_mean_auc,test_auc,image_path
+1,low-valued-plus,mean,9,10,37,0.8549947992869447,0.7911040266181167,./data/output/log/cv_roc_plot_1.png
+2,low-valued-plus,mean,9,10,30,0.8549150042695105,0.7943866971301887,./data/output/log/cv_roc_plot_2.png
+6,low-valued-plus,mean,12,10,23,0.8565682118331006,0.7900524253492787,./data/output/log/cv_roc_plot_6.png
+7,low-valued-plus,mean,12,10,37,0.857706280686249,0.7869322047086801,./data/output/log/cv_roc_plot_7.png
+12,low-valued-plus,mean,15,10,23,0.8609884835337475,0.7633112198256189,./data/output/log/cv_roc_plot_12.png
+13,low-valued-plus,mean,15,10,37,0.8617861450888783,0.762736957254752,./data/output/log/cv_roc_plot_13.png
+14,low-valued-plus,mean,15,10,30,0.8626170557996484,0.7603539040981506,./data/output/log/cv_roc_plot_14.png
+18,low-valued-plus,minmax,9,10,23,0.8613266222369251,0.7982363495466194,./data/output/log/cv_roc_plot_18.png
+19,low-valued-plus,minmax,9,10,37,0.8626230204250452,0.7972286597976611,./data/output/log/cv_roc_plot_19.png
+24,low-valued-plus,minmax,12,10,23,0.8634458889559076,0.8010758094849793,./data/output/log/cv_roc_plot_24.png
+25,low-valued-plus,minmax,12,10,37,0.8644737829197943,0.8032722955622973,./data/output/log/cv_roc_plot_25.png
+26,low-valued-plus,minmax,12,10,30,0.8639583352946371,0.8050719853148957,./data/output/log/cv_roc_plot_26.png
+30,low-valued-plus,minmax,15,10,23,0.8660659047093942,0.7888843334163025,./data/output/log/cv_roc_plot_30.png
+31,low-valued-plus,minmax,15,10,37,0.8667374866478894,0.7917877267074415,./data/output/log/cv_roc_plot_31.png
+32,low-valued-plus,minmax,15,10,30,0.8668633286730292,0.792852296663498,./data/output/log/cv_roc_plot_32.png

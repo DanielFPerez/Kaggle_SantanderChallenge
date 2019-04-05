@@ -100,5 +100,6 @@ def plot_total_rocauc(mean_tpr, mean_auc, std_auc, std_tpr, mean_fpr):
 def save_auc_roc_plot(out_file):
     plt.savefig(out_file, format="png")
 
+
 def close_plot():
     plt.close()
