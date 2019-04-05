@@ -81,7 +81,7 @@ std_cols = ['ID', 'TARGET']
 # Functions
 # ===============================================================
 
-def get_raw_data():
+def get_raw_cleaned_data():
     """
     Loads the provided dataframe, removes the single valued columns and replaces a value in var3 according to the
     results in ../Explore_data
@@ -105,7 +105,7 @@ def get_raw_data():
     return dataframe
 
 
-def filter_datframe(dataframe, filter_case="None"):
+def filter_dataframe(dataframe, filter_case="None"):
     """
     Returns filtered dataframe
     :param dataframe: (pd.dataFrame) pandas dataframe to be filtered
@@ -116,7 +116,7 @@ def filter_datframe(dataframe, filter_case="None"):
         return dataframe
 
     elif filter_case == "low-valued":
-        # Return 2-valued and 3-valued columns
+        # Return 2-valued and 3-valued columns: 136 features
         return dataframe[std_cols + COL_2_VALUED + COL_3_VALUED]
 
     elif filter_case == "low-valued-plus":
@@ -127,15 +127,15 @@ def filter_datframe(dataframe, filter_case="None"):
         return dataframe[std_cols + cols]
 
     elif filter_case == "middle-valued":
-        # Return columns with 100 to 5000 values
+        # Return columns with 100 to 5000 values: 51 features
         return dataframe[std_cols + COL_1k_VALUED + COL_5k_VALUED]
 
     elif filter_case == "middle-valued-plus":
-        # Return columns with 100 to 10000
+        # Return columns with 100 to 10000Ñ 58 features
         return dataframe[std_cols + COL_1k_VALUED + COL_5k_VALUED + COL_10k_VALUED]
 
     elif filter_case == "high-valued":
-        # Return columns with more than 1000 values
+        # Return columns with more than 1000 values: 31 features
         return dataframe[std_cols + COL_5k_VALUED + COL_10k_VALUED + COL_upper10k_VALUED]
     else:
         raise ValueError('Provided filter_case not supported')
