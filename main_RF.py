@@ -23,11 +23,11 @@ plt.interactive(False)
 # ===============================================================
 # Calculate total number of cases to be evaluated
 # ===============================================================
-n_pca_dimension_cases = 1   # Try out 3 different dimension number while doing PCA + dim=10 from empirical test case if
+n_pca_dimension_cases = 0   # Try out 3 different dimension number while doing PCA + dim=10 from empirical test case if
                             # not already present
-n_n_estimators = 1          # Try out 3 different "number of trees" possible values for the random forest + n_estimators=10
+n_n_estimators = 0          # Try out 3 different "number of trees" possible values for the random forest + n_estimators=10
                             # from empirical test case
-n_max_depth = 1             # Try out 3 different "number of trees" possible values for the random forest + depth=30
+n_max_depth = 0             # Try out 3 different "number of trees" possible values for the random forest + depth=30
                             # from empirical test case
 
 # ===============================================================
@@ -35,12 +35,13 @@ n_max_depth = 1             # Try out 3 different "number of trees" possible val
 # ===============================================================
 # Set cases extracting different features from the available data
 # See include/preprocess.py for more df_filter_cases options
-df_filter_cases = ['low-valued-plus',
-                   'middle-valued-plus',
+df_filter_cases = [#'low-valued-plus',
+                   #'middle-valued-plus',
                    'high-valued']
 
 # Set normalization case implemented
-norm_case_cases = ['mean', 'minmax']
+norm_case_cases = [#'mean',
+                   'minmax']
 
 # Set number of PCA components to try out
 # Choose 3 random values between 3 dimensions and 20 dimensions
@@ -169,7 +170,8 @@ for feature_filter in df_filter_cases:
                                                    "test_auc": roc_auc_test,
                                                    "image_path": img_path}
                     # Close plot to be able to plot after each iteration
-                    printAssistant.close_plot()
+                    if roc_auc_test < roc_auc_test_tracker:
+                        printAssistant.close_plot()
 
                 # Log winner rf if test performance achieved
                 if roc_auc_test > roc_auc_test_tracker:

@@ -1,10 +1,4 @@
-# Combient exercise: Santander Customer Satifcation
-
-# Dependencies
-
-
-## Repo Structure
-
-## Instructions
+# Combient exercise
+Go to README.ipbynd
 
 

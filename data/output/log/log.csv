@@ -1,0 +1,14 @@
+,filter_case,norm_case,pca_dim,n_trees,tree_depth,cv_mean_auc,test_auc,image_path
+0,filter_case,norm_case,pca_dim,n_trees,tree_depth,cv_mean_auc,test_auc,image_path
+1,low-valued-plus,mean,11,10,24,0.8583272197963242,0.784333916848418,./data/output/log/cv_roc_plot_1.png
+5,low-valued-plus,mean,11,11,30,0.8590923720300145,0.7766509935152014,./data/output/log/cv_roc_plot_5.png
+6,low-valued-plus,mean,11,10,7,0.8266224144189168,0.7976766483087694,./data/output/log/cv_roc_plot_6.png
+16,low-valued-plus,mean,15,11,24,0.8592955402377284,0.780833736424401,./data/output/log/cv_roc_plot_16.png
+18,low-valued-plus,minmax,11,10,7,0.8324859797117933,0.8058421433190102,./data/output/log/cv_roc_plot_18.png
+19,low-valued-plus,minmax,11,10,24,0.8626511424931356,0.7970839565508023,./data/output/log/cv_roc_plot_19.png
+20,low-valued-plus,minmax,11,10,30,0.8633598898759831,0.7935487379192128,./data/output/log/cv_roc_plot_20.png
+21,low-valued-plus,minmax,11,11,7,0.8331014302510311,0.8076857445914887,./data/output/log/cv_roc_plot_21.png
+23,low-valued-plus,minmax,11,11,30,0.8644155765363196,0.79111631274285,./data/output/log/cv_roc_plot_23.png
+31,low-valued-plus,minmax,15,10,24,0.8660960614980787,0.7957345305175962,./data/output/log/cv_roc_plot_31.png
+32,low-valued-plus,minmax,15,10,30,0.8661543913974551,0.7951586753009304,./data/output/log/cv_roc_plot_32.png
+35,low-valued-plus,minmax,15,11,30,0.8663490949564754,0.794652213936925,./data/output/log/cv_roc_plot_35.png
